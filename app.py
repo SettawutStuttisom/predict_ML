@@ -31,10 +31,10 @@ LIMIT_BAL = st.number_input(
 
 # ✅ เปลี่ยน EDUCATION เป็น selectbox พร้อมคำอธิบาย
 education_dict = {
-    "1 = Graduate School (บัณฑิตศึกษา)": 1,
-    "2 = University (ปริญญาตรี)": 2,
-    "3 = High School (มัธยมศึกษา)": 3,
-    "4 = Others (อื่น ๆ / ไม่ระบุ)": 4
+    "Graduate School (บัณฑิตศึกษา)": 1,
+    "University (ปริญญาตรี)": 2,
+    "High School (มัธยมศึกษา)": 3,
+    "Others (อื่น ๆ / ไม่ระบุ)": 4
 }
 
 education_label = st.selectbox(
