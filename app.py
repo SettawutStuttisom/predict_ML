@@ -122,7 +122,8 @@ if st.button("🔍 Predict"):
     probability = model.predict_proba(input_scaled)[0][1]
 
     st.subheader("📊 ผลการทำนาย")
-    st.write("Probability of Default:", round(probability, 4))
+    st.write("ความน่าจะเป็นของการผิดนัดชำระหนี้:",
+         str(round(probability * 100, 2)) + "%")
 
     if prediction[0] == 1:
         st.error("⚠️ ลูกค้ามีความเสี่ยงผิดนัดชำระ")
