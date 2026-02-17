@@ -53,18 +53,31 @@ AGE = st.number_input(
 )
 
 st.markdown("---")
-st.subheader("📌 ประวัติการชำระย้อนหลัง (-1 ถึง 6)")
-st.caption("-1 = จ่ายครบ | 0 = จ่ายตรงเวลา | 1-6 = ค้างชำระ X เดือน")
+st.subheader("📌 ประวัติการชำระย้อนหลัง 6 เดือน")
+st.caption("เลือกว่ามีการค้างชำระหรือไม่ในแต่ละเดือน")
 
-PAY_0 = st.number_input("PAY_0 (เดือนล่าสุด)", min_value=-1, max_value=6, value=0, step=1)
-PAY_2 = st.number_input("PAY_2 (2 เดือนก่อน)", min_value=-1, max_value=6, value=0, step=1)
-PAY_3 = st.number_input("PAY_3 (3 เดือนก่อน)", min_value=-1, max_value=6, value=0, step=1)
-PAY_4 = st.number_input("PAY_4 (4 เดือนก่อน)", min_value=-1, max_value=6, value=0, step=1)
-PAY_5 = st.number_input("PAY_5 (5 เดือนก่อน)", min_value=-1, max_value=6, value=0, step=1)
-PAY_6 = st.number_input("PAY_6 (6 เดือนก่อน)", min_value=-1, max_value=6, value=0, step=1)
+pay_options = ["ไม่ค้าง", "ค้าง"]
 
-st.markdown("---")
-st.subheader("📌 ข้อมูลทางการเงิน")
+pay0_status = st.selectbox("เดือนล่าสุด", pay_options)
+pay2_status = st.selectbox("2 เดือนก่อน", pay_options)
+pay3_status = st.selectbox("3 เดือนก่อน", pay_options)
+pay4_status = st.selectbox("4 เดือนก่อน", pay_options)
+pay5_status = st.selectbox("5 เดือนก่อน", pay_options)
+pay6_status = st.selectbox("6 เดือนก่อน", pay_options)
+
+# แปลงเป็น 0/1
+PAY_0 = 1 if pay0_status == "ค้าง" else 0
+PAY_2 = 1 if pay2_status == "ค้าง" else 0
+PAY_3 = 1 if pay3_status == "ค้าง" else 0
+PAY_4 = 1 if pay4_status == "ค้าง" else 0
+PAY_5 = 1 if pay5_status == "ค้าง" else 0
+PAY_6 = 1 if pay6_status == "ค้าง" else 0
+
+# นับจำนวนเดือนที่ค้างสะสม
+total_late = PAY_0 + PAY_2 + PAY_3 + PAY_4 + PAY_5 + PAY_6
+
+st.info(f"จำนวนเดือนที่ค้างสะสม: {total_late} เดือน")
+
 
 BILL_AMT1 = st.number_input(
     "BILL_AMT1 (ยอดค้างชำระล่าสุด)",
