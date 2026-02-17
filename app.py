@@ -58,39 +58,43 @@ st.caption("เลือกสถานะการชำระในแต่�
 
 pay_options = ["จ่ายครบ", "จ่ายตรงเวลา", "ค้างชำระ"]
 
-pay_mapping = {
-    "จ่ายครบ": -1,
-    "จ่ายตรงเวลา": 0,
-    "ค้างชำระ": 1
-}
+pay_values = []
 
-pay0_status = st.selectbox("เดือนล่าสุด", pay_options)
-pay2_status = st.selectbox("2 เดือนก่อน", pay_options)
-pay3_status = st.selectbox("3 เดือนก่อน", pay_options)
-pay4_status = st.selectbox("4 เดือนก่อน", pay_options)
-pay5_status = st.selectbox("5 เดือนก่อน", pay_options)
-pay6_status = st.selectbox("6 เดือนก่อน", pay_options)
+for i, label in enumerate([
+    "เดือนล่าสุด",
+    "2 เดือนก่อน",
+    "3 เดือนก่อน",
+    "4 เดือนก่อน",
+    "5 เดือนก่อน",
+    "6 เดือนก่อน"
+]):
+    status = st.selectbox(label, pay_options, key=i)
+    pay_values.append(status)
 
-# แปลงเป็นค่าตัวเลข
-PAY_0 = pay_mapping[pay0_status]
-PAY_2 = pay_mapping[pay2_status]
-PAY_3 = pay_mapping[pay3_status]
-PAY_4 = pay_mapping[pay4_status]
-PAY_5 = pay_mapping[pay5_status]
-PAY_6 = pay_mapping[pay6_status]
+# นับจำนวนเดือนที่ค้าง
+late_count = sum(1 for p in pay_values if p == "ค้างชำระ")
 
-# นับจำนวนเดือนที่ค้างสะสม
-total_late = sum([
-    1 if pay0_status == "ค้างชำระ" else 0,
-    1 if pay2_status == "ค้างชำระ" else 0,
-    1 if pay3_status == "ค้างชำระ" else 0,
-    1 if pay4_status == "ค้างชำระ" else 0,
-    1 if pay5_status == "ค้างชำระ" else 0,
-    1 if pay6_status == "ค้างชำระ" else 0,
-])
+# จำกัดค่าสูงสุดที่ 2 (ตาม dataset)
+late_level = min(late_count, 2)
 
-st.info(f"จำนวนเดือนที่ค้างชำระสะสม: {total_late} เดือน")
+# แปลงค่าเข้าโมเดล
+def convert_status(status):
+    if status == "จ่ายครบ":
+        return -1
+    elif status == "จ่ายตรงเวลา":
+        return 0
+    elif status == "ค้างชำระ":
+        return late_level
 
+PAY_0 = convert_status(pay_values[0])
+PAY_2 = convert_status(pay_values[1])
+PAY_3 = convert_status(pay_values[2])
+PAY_4 = convert_status(pay_values[3])
+PAY_5 = convert_status(pay_values[4])
+PAY_6 = convert_status(pay_values[5])
+
+st.info(f"จำนวนเดือนที่ค้างสะสม: {late_count} เดือน")
+st.write(f"ระดับความรุนแรงที่ส่งเข้าโมเดล: {late_level}")
 
 BILL_AMT1 = st.number_input(
     "BILL_AMT1 (ยอดค้างชำระล่าสุด)",
