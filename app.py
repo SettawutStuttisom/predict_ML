@@ -6,8 +6,8 @@ import joblib
 # ===============================
 # โหลดโมเดลและ scaler
 # ===============================
-model = joblib.load("xgb_model.pkl")
-scaler = joblib.load("scaler.pkl")
+model = joblib.load("xgb_model (1).pkl")
+scaler = joblib.load("scaler (1).pkl")
 
 st.set_page_config(page_title="Credit Default Prediction", page_icon="💳")
 
