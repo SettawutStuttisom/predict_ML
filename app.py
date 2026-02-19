@@ -107,7 +107,7 @@ PAY_5 = convert_status(pay_values[4])
 PAY_6 = convert_status(pay_values[5])
 
 st.info(f"จำนวนเดือนที่ค้างสะสม: {late_count} เดือน")
-st.write(f"ระดับความรุนแรงที่ส่งเข้าโมเดล: {late_level}")
+
 
 BILL_AMT1 = st.number_input(
     "BILL_AMT1 (ยอดค้างชำระล่าสุด)",
