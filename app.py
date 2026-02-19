@@ -71,12 +71,25 @@ for i, label in enumerate([
     status = st.selectbox(label, pay_options, key=i)
     pay_values.append(status)
 
-# นับจำนวนเดือนที่ค้าง
-late_count = sum(1 for p in pay_values if p == "ค้างชำระ")
+ordered_pay = [
+    pay_values[5],  # เดือนที่ 6 ก่อน
+    pay_values[4],
+    pay_values[3],
+    pay_values[2],
+    pay_values[1],
+    pay_values[0]   # เดือนล่าสุด
+]
 
-# จำกัดค่าสูงสุดที่ 2 (ตาม dataset)
+late_count = 0
+
+for status in ordered_pay:
+    if status == "ค้างชำระ":
+        late_count += 1
+    elif status == "จ่ายครบ":
+        late_count = 0  # รีเซ็ตหนี้สะสม
+
+# จำกัดค่าสูงสุดที่ 2 ตาม dataset
 late_level = min(late_count, 2)
-
 # แปลงค่าเข้าโมเดล
 def convert_status(status):
     if status == "จ่ายครบ":
