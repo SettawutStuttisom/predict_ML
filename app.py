@@ -6,8 +6,8 @@ import joblib
 # ===============================
 # โหลดโมเดลและ scaler
 # ===============================
-model = joblib.load("best_xgb_model.pkl")
-scaler = joblib.load("scaler (2).pkl")
+model = joblib.load("best_xgb_model(2).pkl")
+scaler = joblib.load("scaler (3).pkl")
 
 st.set_page_config(page_title="Credit Default Prediction", page_icon="💳")
 
@@ -29,7 +29,6 @@ LIMIT_BAL = st.number_input(
     help="วงเงินเครดิตที่ธนาคารอนุมัติให้ลูกค้า"
 )
 
-# ✅ เปลี่ยน EDUCATION เป็น selectbox พร้อมคำอธิบาย
 education_dict = {
     "Graduate School (บัณฑิตศึกษา)": 1,
     "University (ปริญญาตรี)": 2,
@@ -40,7 +39,7 @@ education_dict = {
 education_label = st.selectbox(
     "EDUCATION (ระดับการศึกษา)",
     list(education_dict.keys()),
-    help="ระดับการศึกษาของลูกค้า ซึ่งมีผลต่อความสามารถในการชำระหนี้"
+    help="ระดับการศึกษาของลูกค้า"
 )
 
 EDUCATION = education_dict[education_label]
@@ -53,6 +52,11 @@ AGE = st.number_input(
 )
 
 st.markdown("---")
+
+# ===============================
+# ประวัติการชำระเงิน
+# ===============================
+
 st.subheader("📌 ประวัติการชำระย้อนหลัง 6 เดือน")
 st.caption("เลือกสถานะการชำระในแต่ละเดือน")
 
@@ -72,12 +76,12 @@ for i, label in enumerate([
     pay_values.append(status)
 
 ordered_pay = [
-    pay_values[5],  # เดือนที่ 6 ก่อน
+    pay_values[5],
     pay_values[4],
     pay_values[3],
     pay_values[2],
     pay_values[1],
-    pay_values[0]   # เดือนล่าสุด
+    pay_values[0]
 ]
 
 late_count = 0
@@ -86,11 +90,10 @@ for status in ordered_pay:
     if status == "ค้างชำระ":
         late_count += 1
     elif status == "จ่ายครบ":
-        late_count = 0  # รีเซ็ตหนี้สะสม
+        late_count = 0
 
-# จำกัดค่าสูงสุดที่ 2 ตาม dataset
 late_level = min(late_count, 2)
-# แปลงค่าเข้าโมเดล
+
 def convert_status(status):
     if status == "จ่ายครบ":
         return -1
@@ -108,6 +111,11 @@ PAY_6 = convert_status(pay_values[5])
 
 st.info(f"จำนวนเดือนที่ค้างสะสม: {late_count} เดือน")
 
+st.markdown("---")
+
+# ===============================
+# ข้อมูลการเงิน
+# ===============================
 
 BILL_AMT1 = st.number_input(
     "BILL_AMT1 (ยอดค้างชำระล่าสุด)",
@@ -122,8 +130,22 @@ PAY_AMT3 = st.number_input(
 )
 
 # ===============================
-# รวมเป็น DataFrame
+# รวมเป็น DataFrame (11 Features)
 # ===============================
+
+features = [
+    "LIMIT_BAL",
+    "EDUCATION",
+    "AGE",
+    "PAY_0",
+    "PAY_2",
+    "PAY_3",
+    "PAY_4",
+    "PAY_5",
+    "PAY_6",
+    "BILL_AMT1",
+    "PAY_AMT3"
+]
 
 input_data = pd.DataFrame([[ 
     LIMIT_BAL,
@@ -137,19 +159,7 @@ input_data = pd.DataFrame([[
     PAY_6,
     BILL_AMT1,
     PAY_AMT3
-]], columns=[
-    "LIMIT_BAL",
-    "EDUCATION",
-    "AGE",
-    "PAY_0",
-    "PAY_2",
-    "PAY_3",
-    "PAY_4",
-    "PAY_5",
-    "PAY_6",
-    "BILL_AMT1",
-    "PAY_AMT3"
-])
+]], columns=features)
 
 # ===============================
 # Predict
@@ -165,12 +175,15 @@ if st.button("🔍 Predict"):
     probability = model.predict_proba(input_scaled)[0][1]
 
     st.subheader("📊 ผลการทำนาย")
-    st.write("ความน่าจะเป็นของการผิดนัดชำระหนี้:",
-         str(round(probability * 100, 2)) + "%")
+
+    st.write(
+        "ความน่าจะเป็นของการผิดนัดชำระหนี้:",
+        f"{probability*100:.2f}%"
+    )
 
     if prediction[0] == 1:
         st.error("⚠️ ลูกค้ามีความเสี่ยงผิดนัดชำระ")
     else:
         st.success("✅ ลูกค้าไม่น่าจะผิดนัดชำระ")
-        
+
 st.markdown("---")
